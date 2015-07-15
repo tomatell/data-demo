@@ -1,0 +1,158 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"id": "uri://registries/tasks#",
+
+	"blocks":{
+		"baseData":{
+			"title": "Základné údaje",
+			"transCode":"schema.tasks.baseData",
+			"type": "object",
+			"properties": {
+				"taskName": {
+					"title": "Názov úlohy",
+					"transCode":"schema.tasks.name",
+					"type": "string",
+					"required": true
+				},
+				"dueDate": {
+					"extends":"uri://registries/commontypes#blocks/date",
+					"title": "Dátum do",
+					"transCode": "schema.tasks.dueDate"
+				},
+				"organization": {
+					"title": "Organizácia",
+					"transCode":"schema.tasks.organization",
+					"type": "object",
+					"objectLink2": {
+						"schema":"uri://registries/organizations#views/company/view",
+						"fields":{
+							"name": "baseData.name"
+						}
+					}
+				},
+				"project": {
+					"title": "Projekt",
+					"transCode":"schema.tasks.project",
+					"type": "object",
+					"objectLink2": {
+						"schema":"uri://registries/projects#views/projects/view",
+						"fields":{
+							"name":"baseData.name"
+						}
+					}
+				},
+				"description": {
+					"title": "Popis",
+					"transCode": "schema.tasks.description",
+					"type": "string",
+					"render":{"component":"psui-textarea"}
+				},
+				"stateOfTask": {
+					"extends": "uri://registries/commonenums#blocks/active",
+					"title": "Stav úlohy",
+					"transCode": "schema.tasks.stateOfTask",
+					"type": "string"
+				}
+			}
+		},
+		"listOfPeople": {
+			"title": "Zoznam ludi",
+			"transCode": "schema.tasks.listOfPeople",
+			"type": "object",
+			"render": {
+				"width": "full"
+			},
+			"properties": {
+				"people": {
+					"title": "Osoby",
+					"transCode": "schema.tasks.people",
+					"type": "array",
+					"items": {
+						"objectLink2": {
+							"schema": "uri://registries/people#views/fullperson/view",
+							"fields": {
+								"surName": "baseData.surName",
+								"firstName": "baseData.name",
+								"registrationID": "baseData.registrationID"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+
+	"models":{
+		"tasks":{
+			"table" : "tasks",
+			"title" : "Úloha",
+			"transCode":"schema.tasks.title",
+			"security": {
+				"create": {
+					"static": [
+						"Registry - write"
+					]
+				},
+				"read": {
+					"static": [
+						"Registry - read"
+					]
+				},
+				"modify": {
+					"static": [
+						"Registry - write"
+					]
+				}
+			},
+			"properties":{
+				"baseData":{
+					"$ref":"uri://registries/tasks#blocks/baseData"
+				},
+				"listOfPeople":{
+					"$ref":"uri://registries/tasks#blocks/listOfPeople"
+				}
+			}
+		}
+	},
+
+	"views":{
+		"tasks":{
+			"new":{
+				"$ref":"uri://registries/tasks#models/tasks"
+			},
+			"view":{
+				"$ref":"uri://registries/tasks#models/tasks"
+			},
+			"search":{
+				"extends":"uri://registries/tasks#models/tasks",
+				"clientActions": [
+					{
+						"__DIRECTIVE__": "schema-redirect-link",
+						"title": "Zobraziť",
+						"params": {
+							"path": "/registry/view/uri~3A~2F~2Fregistries~2Ftasks~23views~2Ftasks/{{model.id}}"
+						}
+					}
+				],
+				"listFields": [
+					{
+						"field":"baseData.taskName",
+						"title":"Úloha",
+						"transCode":"schema.tasks.name"
+					},
+					{
+						"field":"baseData.project",
+						"title":"Projekt",
+						"transCode":"schema.tasks.project"
+					},
+					{
+						"field":"baseData.stateOfTask",
+						"title":"Stav",
+						"transCode":"schema.tasks.stateOfTask"
+					}
+				]
+			}
+		}
+
+	}
+}

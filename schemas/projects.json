@@ -1,0 +1,157 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"id": "uri://registries/projects#",
+
+	"blocks":{
+		"baseData":{
+			"title": "Základné údaje",
+			"transCode":"schema.project.baseData",
+			"type": "object",
+			"properties": {
+				"projectName": {
+					"title": "Názov projektu",
+					"transCode":"schema.project.name",
+					"type": "string",
+					"required": true
+				},
+				"dateFrom": {
+					"extends":"uri://registries/commontypes#blocks/date",
+					"title": "Dátum od",
+					"transCode": "schema.project.dateFrom"
+				},
+				"dueDate": {
+					"extends":"uri://registries/commontypes#blocks/date",
+					"title": "Dátum do",
+					"transCode": "schema.project.dueDate"
+				},
+				"organization": {
+					"title": "Organizácia",
+					"transCode":"schema.project.organization",
+					"type": "object",
+					"objectLink2": {
+						"schema":"uri://registries/organizations#views/company/view",
+						"fields":{
+							"name": "baseData.name"
+						}
+					}
+				},
+				"isPublic": {
+					"extends":"uri://registries/commonenums#blocks/boolean",
+					"title": "Je verejný",
+					"required": true,
+					"transCode": "schema.project.isPublic"
+				},
+				"stateOfProject": {
+					"extends": "uri://registries/commonenums#blocks/active",
+					"title": "Stav projektu",
+					"transCode": "schema.project.stateOfProject",
+					"type": "string"
+				}
+			}
+		},
+		"listOfPeople": {
+			"title": "Zoznam ludi",
+			"transCode": "schema.project.listOfPeople",
+			"type": "object",
+			"render": {
+				"width": "full"
+			},
+			"properties": {
+				"people": {
+					"title": "Osoby",
+					"transCode": "schema.project.people",
+					"type": "array",
+					"items": {
+						"objectLink2": {
+							"schema": "uri://registries/people#views/fullperson/view",
+							"fields": {
+								"surName": "baseData.surName",
+								"firstName": "baseData.name",
+								"registrationID": "baseData.registrationID"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+
+	"models":{
+		"projects":{
+			"table" : "projects",
+			"title" : "Projekt",
+			"transCode":"schema.project.title",
+			"security": {
+				"create": {
+					"static": [
+						"Registry - write"
+					]
+				},
+				"read": {
+					"static": [
+						"Registry - read"
+					]
+				},
+				"modify": {
+					"static": [
+						"Registry - write"
+					]
+				}
+			},
+			"properties":{
+				"baseData":{
+					"$ref":"uri://registries/projects#blocks/baseData"
+				},
+				"listOfPeople":{
+					"$ref":"uri://registries/projects#blocks/listOfPeople"
+				}
+			}
+		}
+	},
+
+	"views":{
+		"projects":{
+			"new":{
+				"$ref":"uri://registries/projects#models/projects"
+			},
+			"view":{
+				"$ref":"uri://registries/projects#models/projects"
+			},
+			"search":{
+				"extends":"uri://registries/projects#models/projects",
+				"clientActions": [
+					{
+						"__DIRECTIVE__": "schema-redirect-link",
+						"title": "Zobraziť",
+						"params": {
+							"path": "/registry/view/uri~3A~2F~2Fregistries~2Fprojects~23views~2Fprojects/{{model.id}}"
+						}
+					}
+				],
+				"listFields": [
+					{
+						"field":"baseData.projectName",
+						"title":"Názov projektu",
+						"transCode":"schema.project.name"
+					},
+					{
+						"field":"baseData.dateFrom",
+						"title":"Dátum od",
+						"transCode":"schema.project.dateFrom"
+					},
+					{
+						"field":"baseData.dueDate",
+						"title":"Dátum do",
+						"transCode":"schema.project.dueDate"
+					},
+					{
+						"field":"baseData.stateOfProject",
+						"title":"Stav projektu",
+						"transCode":"schema.project.stateOfProject"
+					}
+				]
+			}
+		}
+
+	}
+}

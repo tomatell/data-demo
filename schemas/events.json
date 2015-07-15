@@ -1,0 +1,147 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"id": "uri://registries/events#",
+
+	"blocks":{
+		"baseData":{
+			"title": "Základné údaje",
+			"transCode":"schema.events.baseData",
+			"type": "object",
+			"properties": {
+				"eventName": {
+					"title": "Názov udalosti",
+					"transCode":"schema.events.name",
+					"type": "string",
+					"required": true
+				},
+				"dateFrom": {
+					"extends":"uri://registries/commontypes#blocks/date",
+					"title": "Dátum od",
+					"transCode": "schema.events.dateFrom"
+				},
+				"dueDate": {
+					"extends":"uri://registries/commontypes#blocks/date",
+					"title": "Dátum do",
+					"transCode": "schema.events.dueDate"
+				},
+				"organization": {
+					"title": "Organizácia",
+					"transCode":"schema.events.organization",
+					"type": "object",
+					"objectLink2": {
+						"schema":"uri://registries/organizations#views/company/view",
+						"fields":{
+							"name": "baseData.name"
+						}
+					}
+				},
+				"isPublic": {
+					"extends":"uri://registries/commonenums#blocks/boolean",
+					"title": "Je verejný",
+					"required": true,
+					"transCode": "schema.events.isPublic"
+				},
+				"stateOfEvent": {
+					"extends": "uri://registries/commonenums#blocks/active",
+					"title": "Stav úlohy",
+					"transCode": "schema.events.stateOfEvent",
+					"type": "string"
+				}
+			}
+		},
+		"listOfPeople": {
+			"title": "Zoznam ludi",
+			"transCode": "schema.events.listOfPeople",
+			"type": "object",
+			"render": {
+				"width": "full"
+			},
+			"properties": {
+				"people": {
+					"title": "Osoby",
+					"transCode": "schema.events.people",
+					"type": "array",
+					"items": {
+						"objectLink2": {
+							"schema": "uri://registries/people#views/fullperson/view",
+							"fields": {
+								"surName": "baseData.surName",
+								"firstName": "baseData.name",
+								"registrationID": "baseData.registrationID"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+
+	"models":{
+		"events":{
+			"table" : "events",
+			"title" : "Úloha",
+			"transCode":"schema.events.title",
+			"security": {
+				"create": {
+					"static": [
+						"Registry - write"
+					]
+				},
+				"read": {
+					"static": [
+						"Registry - read"
+					]
+				},
+				"modify": {
+					"static": [
+						"Registry - write"
+					]
+				}
+			},
+			"properties":{
+				"baseData":{
+					"$ref":"uri://registries/events#blocks/baseData"
+				},
+				"listOfPeople": {
+					"$ref":"uri://registries/events#blocks/listOfPeople"
+				}
+			}
+		}
+	},
+
+	"views":{
+		"events":{
+			"new":{
+				"$ref":"uri://registries/events#models/events"
+			},
+			"view":{
+				"$ref":"uri://registries/events#models/events"
+			},
+			"search":{
+				"extends":"uri://registries/events#models/events",
+				"clientActions": [
+					{
+						"__DIRECTIVE__": "schema-redirect-link",
+						"title": "Zobraziť",
+						"params": {
+							"path": "/registry/view/uri~3A~2F~2Fregistries~2Fevents~23views~2Fevents/{{model.id}}"
+						}
+					}
+				],
+				"listFields": [
+					{
+						"field":"baseData.eventName",
+						"title":"Úloha",
+						"transCode":"schema.events.name"
+					},
+					{
+						"field":"baseData.stateOfEvent",
+						"title":"Stav",
+						"transCode":"schema.events.stateOfEvent"
+					}
+				]
+			}
+		}
+
+	}
+}
